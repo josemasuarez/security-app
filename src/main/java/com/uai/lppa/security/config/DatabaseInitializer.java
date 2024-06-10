@@ -14,11 +14,15 @@ public class DatabaseInitializer {
 
     @PostConstruct
     public void init() {
-        privilegeRepository.save(new Privilege(null, "CREATE_USER", null));
-        privilegeRepository.save(new Privilege(null, "EDIT_USER", null));
-        privilegeRepository.save(new Privilege(null, "DELETE_USER", null));
-        privilegeRepository.save(new Privilege(null, "ADD_PRIVILEGE", null));
-        privilegeRepository.save(new Privilege(null, "ADMIN", null));
+        createPrivilegeIfNotExists("ADMIN");
+        createPrivilegeIfNotExists("VIEWER");
+        createPrivilegeIfNotExists("EDITOR");
+    }
 
+    private void createPrivilegeIfNotExists(final String privilegeName) {
+        privilegeRepository.getPrivilegeByDescription(privilegeName).orElseGet(() -> {
+            Privilege privilege = new Privilege(null, privilegeName, null);
+            return privilegeRepository.save(privilege);
+        });
     }
 }
